@@ -61,6 +61,7 @@ credentials.json
 service-account.json
 token.json
 client_secret*.json
+*.json.bak
 
 # IDE
 .vscode/
