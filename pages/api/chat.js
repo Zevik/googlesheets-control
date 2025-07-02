@@ -1,4 +1,4 @@
-import { translateToApiCall, executeSheetOperation } from '../../lib/sheets';
+const { translateToApiCall, executeSheetOperation } = require('../../lib/sheets');
 
 export default async function handler(req, res) {
   // Set CORS headers
