@@ -1,0 +1,103 @@
+מסמך אפיון והנחיות למתכנת: הרחבת סוכן AI ל-Google Sheets (שלבים 2 ו-3)
+אל: מתכנת AI
+מאת: צוות הפרויקט
+נושא: המשך פיתוח והוספת יכולות מתקדמות (עיצוב ותרשימים) לסוכן AI קיים.
+1. מבוא והקדמה
+הפרויקט הקיים הוא אפליקציית צ'אט (Flask + Web UI) המאפשרת למשתמשים לנהל קבצי Google Sheets באמצעות הוראות בשפה חופשית.
+הארכיטקטורה הנוכחית:
+האפליקציה מבוססת על ארכיטקטורת "סוכן המשתמש בכלים" (Tool-Using Agent). במרכזה עומדת הפונקציה translate_to_api_call, אשר משתמשת במודל שפה גדול (GPT-4o) כדי לתרגם את בקשת המשתמש לקריאה לפונקציית פייתון אחת ויחידה מתוך רשימה מוגדרת מראש ("ארגז כלים"). ה-AI אינו מייצר קוד API גולמי.
+היכולות הקיימות (ארגז הכלים הנוכחי):
+הבוט כבר תומך במגוון רחב של פעולות, ביניהן:
+ניהול נתונים (CRUD): get_data, update_data, append_data, clear_data.
+כלים לוגיים: delete_rows_by_keyword, find_and_replace.
+כלים ג'נרטיביים: generate_and_add_data.
+ניהול גיליונות: create_sheet, delete_sheet, rename_sheet, duplicate_sheet.
+מיון: sort_sheet.
+מטרת מסמך זה:
+להנחות את המשך הפיתוח ולהגדיר את הדרישות לשתי קטגוריות היכולות הבאות, כפי שהוגדרו בתוכנית-האב של הפרויקט: עיצוב מתקדם (שלב 2) ו-יצירת תרשימים (שלב 3).
+2. עקרונות מנחים למתכנת
+יש להקפיד על עקרונות הפיתוח הבאים כדי לשמור על אחידות, בטיחות ויציבות הפרויקט:
+מודולריות: כל יכולת לוגית חדשה תמומש כפונקציית פייתון נפרדת וברורה ב-app.py.
+בטיחות: אין לאפשר ל-AI לייצר קוד API גולמי. הוא רשאי אך ורק לבחור פונקציה מהרשימה ולספק לה פרמטרים.
+תהליך פיתוח קבוע: עבור כל יכולת חדשה, יש לבצע שני שלבים:
+א. כתיבת פונקציית הכלי בפייתון: מימוש הלוגיקה המדויקת של הפעולה מול ה-API של Google Sheets.
+ב. עדכון "מוח ה-AI": הרחבת ה-system_prompt בפונקציה translate_to_api_call כך שיכלול את הכלי החדש, הסבר על שימושו ודוגמאות ברורות.
+טיפול בשגיאות: על כל פונקציה חדשה לכלול בלוק try...except כדי לטפל בשגיאות API פוטנציאליות ולהחזיר הודעה ברורה למשתמש.
+3. שלב 2: עיצוב מתקדם (Advanced Formatting)
+מטרה: לאפשר למשתמש לשנות את הנראות של תאים (צבע, גופן, יישור וכו') באמצעות שפה חופשית.
+3.1. פונקציית כלי נדרשת: format_cells
+חתימה: format_cells(spreadsheet_id, range_name, formatting_rules)
+פרמטרים:
+spreadsheet_id: מזהה הגיליון (סטנדרטי).
+range_name: הטווח לעיצוב, למשל 'Sheet1!A1:D1'.
+formatting_rules: מילון (dict) פייתון פשוט שה-AI ייצר, אשר מתאר את כללי העיצוב.
+3.2. מילון formatting_rules - פישוט עבור ה-AI
+ה-API של גוגל דורש מבנה JSON מורכב לעיצוב. תפקיד הפונקציה שלנו הוא לתרגם מילון פשוט שה-AI יכול לייצר בקלות, למבנה ה-JSON המורכב.
+מבנה המילון שה-AI ייצר:
+Generated python
+{
+    "backgroundColor": "red",  # או "light_blue", "yellow", etc.
+    "foregroundColor": "white",
+    "bold": True,
+    "italic": False,
+    "underline": True,
+    "fontSize": 14,
+    "horizontalAlignment": "CENTER" # CENTER, LEFT, RIGHT
+}
+Use code with caution.
+Python
+3.3. לוגיקת מימוש בפונקציית format_cells
+הפונקציה תקבל את המילון הפשוט ותבנה ממנו בקשת batchUpdate עבור ה-API.
+הפונקציה תצטרך למפות שמות צבעים פשוטים (כמו 'red', 'blue') לאובייקטי RGB שה-API דורש. ניתן להשתמש במילון מיפוי פנימי.
+'red' -> {'red': 1.0, 'green': 0.0, 'blue': 0.0}
+'light_blue' -> {'red': 0.8, 'green': 0.9, 'blue': 1.0}
+הפונקציה תבנה את אובייקט ה-CellFormat הנדרש. לדוגמה, אם formatting_rules מכיל 'bold': True ו-'fontSize': 14, היא תייצר את ה-JSON הפנימי: {'textFormat': {'bold': True, 'fontSize': 14}}.
+הבקשה הסופית שתישלח ל-API תהיה במבנה הנדרש, המכיל repeatCell על הטווח שצוין.
+3.4. הנחיות ל-AI (להוספה ל-system_prompt)
+Generated code
+--- FORMATTING TOOLS ---
+- `format_cells(spreadsheet_id, range_name, formatting_rules)`: Use to change cell appearance (colors, font, alignment). `formatting_rules` is a dictionary.
+
+CRITICAL RULES FOR FORMATTING:
+- Infer the formatting_rules dictionary from the user's request. Possible keys are: backgroundColor, foregroundColor, bold, italic, underline, fontSize, horizontalAlignment.
+- You can combine multiple rules in one call.
+
+EXAMPLES:
+User: "צבע את הרקע של A1 עד B2 בצהוב" -> `format_cells(spreadsheet_id='...', range_name='Sheet1!A1:B2', formatting_rules={'backgroundColor': 'yellow'})`
+User: "הדגש את הטקסט בשורה 1, מרכז אותו, וקבע גודל גופן 12" -> `format_cells(spreadsheet_id='...', range_name='Sheet1!1:1', formatting_rules={'bold': True, 'horizontalAlignment': 'CENTER', 'fontSize': 12})`
+Use code with caution.
+4. שלב 3: יצירת תרשימים (Charting)
+מטרה: לאפשר למשתמש ליצור תרשימים וגרפים מהנתונים בגיליון.
+4.1. פונקציית כלי נדרשת: create_chart
+חתימה: create_chart(spreadsheet_id, sheet_name, source_range, chart_type, title)
+פרמטרים:
+spreadsheet_id: מזהה הגיליון (סטנדרטי).
+sheet_name: שם הגיליון שבו יוצב התרשים.
+source_range: טווח הנתונים שממנו ייווצר התרשים, למשל 'Sheet1!A1:C20'.
+chart_type: מחרוזת המגדירה את סוג התרשים. ה-AI יבחר מתוך רשימה מוגדרת: 'COLUMN', 'BAR', 'PIE', 'LINE', 'SCATTER'.
+title: כותרת שתוצג מעל התרשים.
+4.2. לוגיקת מימוש בפונקציית create_chart
+הפונקציה תצטרך לקבל את ה-sheetId המספרי של sheet_name באמצעות הפונקציה _get_sheet_id_by_name שכבר קיימת.
+הפונקציה תבנה בקשת batchUpdate המכילה בקשת addChart.
+אובייקט התרשים (ChartSpec) יוגדר לפי הפרמטרים:
+ה-title יוכנס ישירות.
+ה-chart_type יוגדר בתוך basicChart או סוג רלוונטי אחר.
+ה-source_range יוגדר תחת domains ו-series.
+4.3. הנחיות ל-AI (להוספה ל-system_prompt)
+Generated code
+--- ADVANCED FEATURES ---
+- `create_chart(spreadsheet_id, sheet_name, source_range, chart_type, title)`: Use to create charts from data.
+
+CRITICAL RULES FOR CHARTING:
+- Infer the chart_type from the user's request. Choose one of: 'COLUMN', 'BAR', 'PIE', 'LINE', 'SCATTER'.
+- Infer the source_range of the data to be charted.
+
+EXAMPLES:
+User: "צור גרף עמודות מהנתונים בעמודות A ו-C" -> `create_chart(spreadsheet_id='...', sheet_name='Sheet1', source_range='Sheet1!A:C', chart_type='COLUMN', title='גרף עמודות')`
+User: "אני רוצה גרף פאי על בסיס הנתונים ב-A1 עד B10, עם כותרת 'התפלגות'" -> `create_chart(spreadsheet_id='...', sheet_name='Sheet1', source_range='Sheet1!A1:B10', chart_type='PIE', title='התפלגות')`
+Use code with caution.
+5. סיכום והערות נוספות
+הוספת שתי קטגוריות אלו תהפוך את הסוכן לכלי ניהול וניתוח רב עוצמה.
+מומלץ להתחיל במימוש שלב 2 (עיצוב), מכיוון שהוא מהווה בסיס טוב לעבודה עם בקשות batchUpdate מורכבות, ולאחר מכן לעבור לשלב 3 (תרשימים).
+יש להקפיד על בדיקות יסודיות של כל פונקציה חדשה עם מגוון בקשות משתמש כדי לוודא שה-AI בוחר בכלי הנכון ומספק את הפרמטרים בצורה תקינה.
+בהצלחה
