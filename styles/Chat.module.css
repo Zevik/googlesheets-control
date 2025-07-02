@@ -1,0 +1,229 @@
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Assistant', sans-serif;
+  direction: rtl;
+  background-color: #f5f5f5;
+}
+
+.header {
+  padding: 20px;
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0 0 15px 0;
+  font-size: 1.8em;
+  font-weight: 700;
+}
+
+.spreadsheetInput {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.spreadsheetInput label {
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.idInput {
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  font-size: 0.9em;
+  direction: ltr;
+  text-align: left;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.idInput::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.idInput:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.chatWindow {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+  min-height: 0;
+}
+
+.message {
+  margin: 15px 0;
+  display: flex;
+}
+
+.userMessage {
+  justify-content: flex-start;
+}
+
+.botMessage {
+  justify-content: flex-end;
+}
+
+.messageContent {
+  display: inline-block;
+  padding: 12px 16px;
+  border-radius: 18px;
+  max-width: 75%;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.userMessage .messageContent {
+  background-color: #007bff;
+  color: white;
+  border-bottom-left-radius: 8px;
+}
+
+.botMessage .messageContent {
+  background-color: #e9e9eb;
+  color: #333;
+  border-bottom-right-radius: 8px;
+}
+
+/* עיצוב טבלאות בתוך הודעות */
+.messageContent table {
+  margin: 10px 0;
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85em;
+}
+
+.messageContent table td {
+  padding: 4px 8px !important;
+  border: 1px solid #ddd !important;
+  text-align: right;
+  background-color: white;
+}
+
+.messageContent table tr:nth-child(even) td {
+  background-color: #f8f9fa;
+}
+
+.chatForm {
+  display: flex;
+  padding: 20px;
+  border-top: 1px solid #ddd;
+  background-color: white;
+  gap: 12px;
+}
+
+.messageInput {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 1em;
+  font-family: 'Assistant', sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.messageInput:focus {
+  border-color: #007bff;
+}
+
+.messageInput:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.sendButton {
+  padding: 12px 24px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Assistant', sans-serif;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.sendButton:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.sendButton:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+/* רספונסיביות */
+@media (max-width: 768px) {
+  .container {
+    height: 100vh;
+  }
+  
+  .header {
+    padding: 15px;
+  }
+  
+  .header h1 {
+    font-size: 1.5em;
+  }
+  
+  .chatWindow {
+    padding: 15px;
+  }
+  
+  .messageContent {
+    max-width: 85%;
+    padding: 10px 14px;
+  }
+  
+  .chatForm {
+    padding: 15px;
+    gap: 10px;
+  }
+  
+  .messageInput {
+    padding: 10px 14px;
+    font-size: 0.95em;
+  }
+  
+  .sendButton {
+    padding: 10px 20px;
+    font-size: 0.95em;
+  }
+}
+
+@media (max-width: 480px) {
+  .spreadsheetInput {
+    flex-direction: column;
+  }
+  
+  .idInput {
+    font-size: 0.85em;
+  }
+  
+  .messageContent {
+    max-width: 90%;
+    font-size: 0.9em;
+  }
+  
+  .chatForm {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .sendButton {
+    align-self: stretch;
+  }
+} 
