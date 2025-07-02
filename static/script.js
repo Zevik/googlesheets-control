@@ -5,14 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const spreadsheetIdInput = document.getElementById('spreadsheet-id');
     const sendButton = chatForm.querySelector('button');
 
-    // Load saved spreadsheet ID from localStorage
-    const savedSpreadsheetId = localStorage.getItem('googlesheets-spreadsheet-id');
-    if (savedSpreadsheetId) {
-        spreadsheetIdInput.value = savedSpreadsheetId;
-        // Trigger input event to enable chat
-        spreadsheetIdInput.dispatchEvent(new Event('input'));
-    }
-
     // Enable/disable chat based on spreadsheet ID
     spreadsheetIdInput.addEventListener('input', () => {
         const spreadsheetId = spreadsheetIdInput.value.trim();
@@ -33,6 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
             messageInput.placeholder = "יש להזין מזהה גיליון תחילה";
         }
     });
+
+    // Load saved spreadsheet ID from localStorage (after event listener is attached)
+    const savedSpreadsheetId = localStorage.getItem('googlesheets-spreadsheet-id');
+    if (savedSpreadsheetId) {
+        spreadsheetIdInput.value = savedSpreadsheetId;
+        // Trigger input event to enable chat
+        spreadsheetIdInput.dispatchEvent(new Event('input'));
+    }
 
     chatForm.addEventListener('submit', async (event) => {
         event.preventDefault();
