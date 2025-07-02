@@ -8,5 +8,11 @@
     "OPENAI_API_KEY": "@openai-api-key",
     "GOOGLE_SERVICE_ACCOUNT_EMAIL": "@google-service-account-email", 
     "GOOGLE_PRIVATE_KEY": "@google-private-key"
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ]
 }
